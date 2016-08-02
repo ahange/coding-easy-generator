@@ -2,71 +2,106 @@ package test.codingeasy;
 
 import org.junit.Test;
 
+import codingeasy.Annotation;
 import codingeasy.Blocks;
+import codingeasy.Javadoc;
 import codingeasy.Method;
+import codingeasy.Modifier;
+import codingeasy.Method.MethodBuilder;
 import codingeasy.Type;
+import codingeasy.Type.TypeBuilder;
 
 public class TestMethod extends AbstractCodingTest {
 
 	@Test
 	public void test() {
-		Type type = new Type("test.A");
-		Method method = new Method(type, "test");
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		Method method = Method.builder(typeBuilder, "test").returnType("void").addModifier(Modifier.PUBLIC).build();
 		
-		expect(method, "\n\tpublic test() {\n\t}");
+		expect(method, "\npublic void test() {\n}");
 	}
 
 	@Test
 	public void testWithParameter() {
-		Type type = new Type("test.A");
-		Method method = new Method(type, "test");
-		method.param("name").type("String");
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType("void").addModifier(Modifier.PUBLIC);
+		methodBuilder.param("name").type("String").build();
+		Method method = methodBuilder.build();
 		
-		expect(method, "\n\tpublic test(String name) {\n\t}");
+		expect(method, "\npublic void test(String name) {\n}");
 	}
 
 	@Test
 	public void testWithParameters() {
-		Type type = new Type("test.A");
-		Method method = new Method(type, "test");
-		method.param("name").type("String");
-		method.param("age").type("int");
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType("void").addModifier(Modifier.PUBLIC);
+		methodBuilder.param("name").type("String").build();
+		methodBuilder.param("age").type("int").build();
+		Method method = methodBuilder.build();
 		
-		expect(method, "\n\tpublic test(String name, int age) {\n\t}");
+		expect(method, "\npublic void test(String name, int age) {\n}");
 	}
 
 	@Test
 	public void testWithAnnotation() {
-		Type type = new Type("test.A");
-		Method method = new Method(type, "test");
-		method.param("name").type("String");
-		method.param("age").type("int");
-		method.addAnnotation("Deprecated");
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType("String").addModifier(Modifier.PUBLIC);
+		methodBuilder.param("name").type("String").build();
+		methodBuilder.param("age").type("int").build();
+		methodBuilder.addAnnotation(Annotation.builder("Deprecated").build());
+		Method method = methodBuilder.build();
 		
-		expect(method, "\n\t@Deprecated\n\tpublic test(String name, int age) {\n\t}");
+		expect(method, "\n@Deprecated\npublic String test(String name, int age) {\n}");
 	}
 
 	@Test
 	public void testWithAnnotations() {
-		Type type = new Type("test.A");
-		Method method = new Method(type, "test");
-		method.param("name").type("String");
-		method.param("age").type("int");
-		method.addAnnotation("Deprecated");
-		method.addAnnotation("Documented");
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType("int").addModifier(Modifier.PUBLIC);
+		methodBuilder.param("name").type("String").build();
+		methodBuilder.param("age").type("int").build();
+		methodBuilder.addAnnotation(Annotation.builder("Deprecated").build());
+		methodBuilder.addAnnotation(Annotation.builder("Documented").build());
+		Method method = methodBuilder.build();
 		
-		expect(method, "\n\t@Deprecated\n\t@Documented\n\tpublic test(String name, int age) {\n\t}");
+		expect(method, "\n@Deprecated\n@Documented\npublic int test(String name, int age) {\n}");
 	}
 
 	@Test
 	public void testHelloWorld() {
 		String statement = "System.out.println(\"Hello World!\");";
 		
-		Type type = new Type("test.A");
-		Method method = new Method(type, "test");
-		method.body(Blocks._new(statement));
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType("int").addModifier(Modifier.PUBLIC);
+		methodBuilder.body(Blocks._new(statement));
+		Method method = methodBuilder.build();
 		
-		expect(method, "\n\tpublic test() {\n\t\t" + statement + "\n\t}");
+		expect(method, "\npublic int test() {\n\t" + statement + "\n}");
+	}
+
+	@Test
+	public void testJavadoc() {
+		String statement = "System.out.println(\"Hello World!\");";
+		
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType(String.class).addModifier(Modifier.PUBLIC);
+		methodBuilder.javadoc(Javadoc.builder().text("Testing javadoc").build());
+		methodBuilder.body(Blocks._new(statement));
+		Method method = methodBuilder.build();
+		
+		expect(method, "\n/**\n * Testing javadoc\n */\npublic String test() {\n\t" + statement + "\n}");
+	}
+
+	@Test
+	public void testJavadocWithParameters() {
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType("String").addModifier(Modifier.PUBLIC);
+		methodBuilder.javadoc(Javadoc.builder().text("Testing javadoc").returnDoc("the user's name").build());
+		methodBuilder.param("name").type("String").javadoc(Javadoc.builder().text("the user's name").build()).build();
+		methodBuilder.param("age").type("int").javadoc(Javadoc.builder().text("the user's age").build()).build();
+		Method method = methodBuilder.build();
+		
+		expect(method, "\n/**\n * Testing javadoc\n * @param name the user's name\n * @param age the user's age\n * @return the user's name\n */\npublic void test(String name, int age) {\n}", true);
 	}
 	
 }

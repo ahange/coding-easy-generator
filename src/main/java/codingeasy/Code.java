@@ -1,9 +1,11 @@
 package codingeasy;
 
+import codingeasy.Type.TypeBuilder;
+
 public class Code {
 
-	public static Type newType(String name) {
-		return new Type(name);
+	public static TypeBuilder newType(String name) {
+		return Type.builder(name);
 	}
 
 }

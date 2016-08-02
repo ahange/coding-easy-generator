@@ -1,128 +1,73 @@
 package codingeasy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import codingeasy.Constructor.ConstructorBuilder;
+import codingeasy.Field.FieldBuilder;
+import codingeasy.Method.MethodBuilder;
+
 public class Type extends CodeGen<Type> {
 
-	private String packageName;
-	private EnumType enumType = EnumType.CLASS;
-	private String superClass;
-	private final Set<String> imports = new HashSet<String>();
-	private final Set<String> interfaces = new HashSet<String>();
-	private final List<Field> fields = new ArrayList<Field>();
-	private final List<Method> methods = new ArrayList<Method>();
-
-	public Type(String className) {
-		super(className.contains(".") ? className.substring(className.indexOf(".") + 1) : className);
-
-		if (className.contains(".")) {
-			packageName(className.substring(0, className.lastIndexOf(".")));
-		}
-		
-		addModifier(Modifier.PUBLIC);
+	private final String packageName;
+	private final EnumType enumType;
+	private final String superClass;
+	private final Set<String> imports;
+	private final Set<String> interfaces;
+	private final List<Field> fields;
+	private final List<Method> methods;
+	
+	Type(String name, Javadoc javadoc, List<Modifier> modifiers, List<Annotation> annotations,
+			String packageName, EnumType enumType, String superClass, Set<String> imports, Set<String> interfaces,
+			List<Field> fields, List<Method> methods) {
+		super(name, javadoc, modifiers, annotations);
+		this.packageName = packageName;
+		this.enumType = enumType;
+		this.superClass = superClass;
+		this.imports = Collections.unmodifiableSet(imports);
+		this.interfaces = Collections.unmodifiableSet(interfaces);
+		this.fields = Collections.unmodifiableList(fields);
+		this.methods = Collections.unmodifiableList(methods);
 	}
 
-	public String getSuperClass() {
+	public final String getSuperClass() {
 		return superClass;
 	}
 	
-	public Type superClass(Class<?> type) {
-		return superClass(type.getName());
-	}
-	
-	public Type superClass(String type) {
-		addImport(type);
-		
-		type = type.replace("java.lang.", "");
-		if (type.contains(".")) {
-			type = type.substring(type.lastIndexOf(".") + 1);
-		}
-		
-		superClass = type;
-		return this;
-	}
-	
-	public Type addInterface(Class<?> type) {
-		return addInterface(type.getName());
-	}
-	
-	public Type addInterface(String type) {
-		addImport(type);
-		
-		type = type.replace("java.lang.", "");
-		if (type.contains(".")) {
-			type = type.substring(type.lastIndexOf(".") + 1);
-		}
-		
-		interfaces.add(type);
-		return this;
-	}
-	
-	public Field field(String name) {
-		Field field = new Field(this, name);
-		fields.add(field);
-		return field;
-	}
-
-	public Method constructor() {
-		Constructor method = new Constructor(this);
-		methods.add(method);
-		return method;
-	}
-
-	public Method method(String name) {
-		Method method = new Method(this, name);
-		methods.add(method);
-		return method;
-	}
-
-	public EnumType getType() {
+	public final EnumType getType() {
 		return enumType;
 	}
 
-	public Type type(EnumType type) {
-		enumType = type;
-		return this;
+	public final EnumType getEnumType() {
+		return enumType;
 	}
 
-	public Type addImport(Class<?> classType) {
-		return addImport(classType.getName());
+	public final List<Field> getFields() {
+		return fields;
 	}
-
-	public Type addImport(String classType) {
-		if (!classType.contains(".") || classType.startsWith("java.lang")) {
-			return this;
-		}
-		
-		String simpleName = classType.substring(classType.lastIndexOf(".") + 1);
-		String packName = classType.replace("." + simpleName, "");
-		
-		if (packName.equals(packageName)) {
-			return this;
-		}
-		
-		if (classType.contains("<")) {
-			classType = classType.substring(0, classType.indexOf("<"));
-		}
-		imports.add(classType);
-		return this;
+	
+	public final Set<String> getImports() {
+		return imports;
 	}
-
-	public String getSimpleName() {
+	
+	public final Set<String> getInterfaces() {
+		return interfaces;
+	}
+	
+	public final List<Method> getMethods() {
+		return methods;
+	}
+	
+	public final String getSimpleName() {
 		return getName().replace(getPackageName(), "");
 	}
 	
-	public String getPackageName() {
+	public final String getPackageName() {
 		return packageName;
-	}
-
-	public Type packageName(String packageName) {
-		this.packageName = packageName;
-		return this;
 	}
 
 	@Override
@@ -163,17 +108,138 @@ public class Type extends CodeGen<Type> {
 		
 		code.openBrace();
 
+		CodePrinter inner = new CodePrinter();
+		
 		for (Field field : fields) {
-			field.print(code);
+			field.print(inner);
 		}
-
-		code.line().line();
 
 		for (Method method : methods) {
-			method.print(code);
+			method.print(inner);
 		}
 
+		if (!inner.isEmpty()) {
+			code.ident().append(inner.format().replace("\n", "\n\t"));
+		}
+		
 		code.line().closeBrace();
 	}
+	
+	public static TypeBuilder builder(String name) {
+		return new TypeBuilder(name);
+	}
 
+	public static class TypeBuilder extends CodeGen.CodeGenBuilder<TypeBuilder> {
+		
+		private String packageName;
+		private EnumType enumType = EnumType.CLASS;
+		private String superClass;
+		private Set<String> imports = new HashSet<>();
+		private Set<String> interfaces = new HashSet<>();
+		private List<Field> fields = new ArrayList<>();
+		private List<Method> methods = new ArrayList<>();
+		
+		TypeBuilder(String name) {
+			super(name);
+			
+			if (name.contains(".")) {
+				packageName(name.substring(0, name.lastIndexOf(".") - 1));
+			}
+			
+			addModifier(Modifier.PUBLIC);
+		}
+		
+		public TypeBuilder superClass(Class<?> type) {
+			return superClass(type.getName());
+		}
+		
+		public TypeBuilder superClass(String type) {
+			addImport(type);
+			
+			type = type.replace("java.lang.", "");
+			if (type.contains(".")) {
+				type = type.substring(type.lastIndexOf(".") + 1);
+			}
+			
+			superClass = type;
+			return this;
+		}
+		
+		public TypeBuilder addInterface(Class<?> type) {
+			return addInterface(type.getName());
+		}
+		
+		public TypeBuilder addInterface(String type) {
+			addImport(type);
+			
+			type = type.replace("java.lang.", "");
+			if (type.contains(".")) {
+				type = type.substring(type.lastIndexOf(".") + 1);
+			}
+			
+			interfaces.add(type);
+			return this;
+		}
+		
+		public TypeBuilder field(Field field) {
+			fields.add(field);
+			return this;
+		}
+		
+		public FieldBuilder field(String name) {
+			return Field.builder(this, name);
+		}
+
+		public ConstructorBuilder constructor() {
+			return Constructor.builder(this);
+		}
+
+		public TypeBuilder method(Method method) {
+			methods.add(method);
+			return this;
+		}
+		
+		public MethodBuilder method(String name) {
+			return Method.builder(this, name);
+		}
+
+		public TypeBuilder type(EnumType type) {
+			enumType = type;
+			return this;
+		}
+
+		public TypeBuilder addImport(Class<?> classType) {
+			return addImport(classType.getName());
+		}
+
+		public TypeBuilder addImport(String classType) {
+			if (!classType.contains(".") || classType.startsWith("java.lang")) {
+				return this;
+			}
+			
+			String simpleName = classType.substring(classType.lastIndexOf(".") + 1);
+			String packName = classType.replace("." + simpleName, "");
+			
+			if (packName.equals(packageName)) {
+				return this;
+			}
+			
+			if (classType.contains("<")) {
+				classType = classType.substring(0, classType.indexOf("<"));
+			}
+			imports.add(classType);
+			return this;
+		}
+
+		public TypeBuilder packageName(String packageName) {
+			this.packageName = packageName;
+			return this;
+		}
+		
+		public Type build() {
+			return new Type(getName(), getJavadoc(), getModifiers(), getAnnotations(), packageName, enumType, superClass, imports, interfaces, fields, methods);
+		}
+		
+	}
+	
 }

@@ -1,7 +1,8 @@
 package codingeasy;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Annotation implements Printable {
@@ -9,61 +10,62 @@ public class Annotation implements Printable {
 	private static final String VALUE = "value";
 	
 	private final String name;
-	private final List<AnnotationParameter> parameters = new ArrayList<>();
+	private final Map<String, String> parameters;
 	
-	public Annotation(String name) {
+	Annotation(String name, Map<String, String> parameters) {
 		this.name = name;
+		this.parameters = Collections.unmodifiableMap(parameters);
 	}
 
-	public AnnotationParameter param(String name) {
-		AnnotationParameter param = new AnnotationParameter(name);
-		parameters.add(param);
-		return param;
-	}
-
-	public AnnotationParameter value(String value) {
-		AnnotationParameter param = new AnnotationParameter(VALUE).value(value);
-		parameters.add(param);
-		return param;
-	}
-
-	public AnnotationParameter stringValue(String value) {
-		AnnotationParameter param = new AnnotationParameter(VALUE).stringValue(value);
-		parameters.add(param);
-		return param;
-	}
-	
 	@Override
 	public void print(CodePrinter code) {
 		code.append("@").append(name);
 		if (!parameters.isEmpty()) {
 			code.openParenthesis();
-			if (parameters.size() == 1 && parameters.get(0).name.equals(VALUE)) {
-				code.append(parameters.get(0).value);
+			if (parameters.size() == 1 && parameters.containsKey(VALUE)) {
+				code.append(parameters.get(VALUE));
 			} else {
-				code.append(parameters.stream().map(param -> param.name + " = " + param.value).collect(Collectors.joining(", ")));
+				code.append(parameters.entrySet().stream().map(e -> e.getKey() + " = " + e.getValue()).collect(Collectors.joining(", ")));
 			}
 			code.closeParenthesis();
 		}
 	}
 	
-	public static final class AnnotationParameter {
+	public static AnnotationBuilder builder(String name) {
+		return new AnnotationBuilder(name);
+	}
+	
+	public static class AnnotationBuilder {
 		
 		private final String name;
-		private String value;
+		private Map<String, String> parameters = new LinkedHashMap<>();
 		
-		public AnnotationParameter(String name) {
+		AnnotationBuilder(String name) {
 			this.name = name;
 		}
 		
-		public AnnotationParameter value(String value) {
-			this.value = value;
+		public AnnotationBuilder param(String name, String value) {
+			parameters.put(name, value);
 			return this;
 		}
 
-		public AnnotationParameter stringValue(String value) {
-			this.value = "\"" + value + "\"";
+		public AnnotationBuilder stringParam(String name, String value) {
+			parameters.put(name, "\"" + value + "\"");
 			return this;
+		}
+
+		public AnnotationBuilder value(String value) {
+			parameters.put(VALUE, value);
+			return this;
+		}
+
+		public AnnotationBuilder stringValue(String value) {
+			parameters.put(VALUE, "\"" + value + "\"");
+			return this;
+		}
+		
+		public Annotation build() {
+			return new Annotation(name, parameters);
 		}
 		
 	}

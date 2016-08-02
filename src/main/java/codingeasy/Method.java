@@ -1,68 +1,40 @@
 package codingeasy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import codingeasy.Parameter.ParameterBuilder;
+import codingeasy.Type.TypeBuilder;
+
 public class Method extends CodeGen<Method> {
 
-	private final Type type;
-	private final List<Parameter> parameters = new ArrayList<Parameter>();
-	private String returnType;
-	private CodeBlock body;
-
-	public Method(Type type, String name) {
-		super(name);
-
-		this.type = type;
-		
-		addModifier(Modifier.PUBLIC);
-	}
-
-	public Parameter param(String name) {
-		Parameter param = new Parameter(type, name);
-		parameters.add(param);
-		return param;
-	}
-
-	public Method type(Class<?> type) {
-		return type(type.getName());
-	}
-
-	public Method type(String type) {
-		if (Objects.isNull(type)) {
-			return this;
-		}
-		
-		this.type.addImport(type);
-		
-		type = type.replace("java.lang.", "");
-		if (type.contains(".")) {
-			type = type.substring(type.lastIndexOf(".") + 1);
-		}
-		
-		this.returnType = type;
-		return this;
-	}
-
-	public Method body(String body) {
-		this.body = Blocks._new(body);
-		return this;
-	}
+	private final String returnType;
+	private final List<Parameter> parameters;
+	private final CodeBlock body;
 	
-	public Method body(CodeBlock body) {
+	Method(String name, Javadoc javadoc, List<Modifier> modifiers, List<Annotation> annotations,
+			String returnType, List<Parameter> parameters, CodeBlock body) {
+		super(name, javadoc, modifiers, annotations);
+		this.returnType = returnType;
+		this.parameters = Collections.unmodifiableList(parameters);
 		this.body = body;
-		return this;
 	}
 
 	@Override
 	public void print(CodePrinter code) {
-		code.line().ident();
+		code.line();
+		
+		Javadoc javadoc = getJavadoc();
+		if (!Objects.isNull(javadoc)) {
+			javadoc.print(code);
+		}
 		
 		List<Annotation> annotations = getAnnotations();
 		annotations.forEach(annotation -> {
 			annotation.print(code);
-			code.line().ident();
+			code.line();
 		});
 		
 		for (Modifier modifier : getModifiers()) {
@@ -90,11 +62,90 @@ public class Method extends CodeGen<Method> {
 			code.end();
 		} else {
 			if (body != null) {
-				code.append(body.build().replace("\n", "\n\t"));
+				code.append(body.build());
 			} else {
-				code.openBrace().ident().closeBrace();
+				code.openBrace().closeBrace();
 			}
 		}
+	}
+	
+	public static MethodBuilder builder(TypeBuilder typeBuilder, String name) {
+		return new MethodBuilder(typeBuilder, name);
+	}
+	
+	public static class MethodBuilder extends CodeGenBuilder<MethodBuilder> {
+
+		private final TypeBuilder typeBuilder;
+		private final List<Parameter> parameters = new ArrayList<>();
+		private String returnType = "void";
+		private CodeBlock body;
+
+		MethodBuilder(TypeBuilder typeBuilder, String name) {
+			super(name);
+			this.typeBuilder = typeBuilder;
+		}
+		
+		protected TypeBuilder getTypeBuilder() {
+			return typeBuilder;
+		}
+		
+		public List<Parameter> getParameters() {
+			return parameters;
+		}
+		
+		public String getReturnType() {
+			return returnType;
+		}
+		
+		public ParameterBuilder param(String name) {
+			return Parameter.builder(this, name);
+		}
+
+		public MethodBuilder returnType(Class<?> type) {
+			return returnType(type.getName());
+		}
+
+		public MethodBuilder returnType(String type) {
+			if (Objects.isNull(type)) {
+				return this;
+			}
+			
+			this.typeBuilder.addImport(type);
+			
+			type = type.replace("java.lang.", "");
+			if (type.contains(".")) {
+				type = type.substring(type.lastIndexOf(".") + 1);
+			}
+			
+			this.returnType = type;
+			return this;
+		}
+
+		public CodeBlock getBody() {
+			return body;
+		}
+		
+		public MethodBuilder body(String body) {
+			this.body = Blocks._new(body);
+			return this;
+		}
+		
+		public MethodBuilder body(CodeBlock body) {
+			this.body = body;
+			return this;
+		}
+		
+		public MethodBuilder param(Parameter parameter) {
+			parameters.add(parameter);
+			return this;
+		}
+
+		public Method build() {
+			Method method = new Method(getName(), getJavadoc(), getModifiers(), getAnnotations(), returnType, parameters, body);
+			typeBuilder.method(method);
+			return method;
+		}
+		
 	}
 
 }

@@ -2,71 +2,79 @@ package test.codingeasy;
 
 import org.junit.Test;
 
+import codingeasy.Annotation;
 import codingeasy.Blocks;
 import codingeasy.Constructor;
+import codingeasy.Constructor.ConstructorBuilder;
 import codingeasy.Type;
+import codingeasy.Type.TypeBuilder;
 
 public class TestConstructor extends AbstractCodingTest {
 
 	@Test
 	public void test() {
-		Type type = new Type("test.A");
-		Constructor constructor = new Constructor(type);
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		Constructor constructor = Constructor.builder(typeBuilder).build();
 		
-		expect(constructor, "\n\tpublic A() {\n\t}");
+		expect(constructor, "\npublic A() {\n}");
 	}
 
 	@Test
 	public void testWithParameter() {
-		Type type = new Type("test.A");
-		Constructor constructor = new Constructor(type);
-		constructor.param("name").type("String");
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		ConstructorBuilder constructorBuilder = Constructor.builder(typeBuilder);
+		constructorBuilder.param("name").type("String").build();
+		Constructor constructor = constructorBuilder.build();
 		
-		expect(constructor, "\n\tpublic A(String name) {\n\t}");
+		expect(constructor, "\npublic A(String name) {\n}");
 	}
 
 	@Test
 	public void testWithParameters() {
-		Type type = new Type("test.A");
-		Constructor constructor = new Constructor(type);
-		constructor.param("name").type("String");
-		constructor.param("age").type("int");
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		ConstructorBuilder constructorBuilder = Constructor.builder(typeBuilder);
+		constructorBuilder.param("name").type("String").build();
+		constructorBuilder.param("age").type("int").build();
+		Constructor constructor = constructorBuilder.build();
 		
-		expect(constructor, "\n\tpublic A(String name, int age) {\n\t}");
+		expect(constructor, "\npublic A(String name, int age) {\n}");
 	}
 
 	@Test
 	public void testWithAnnotation() {
-		Type type = new Type("test.A");
-		Constructor constructor = new Constructor(type);
-		constructor.param("name").type("String");
-		constructor.param("age").type("int");
-		constructor.addAnnotation("Deprecated");
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		ConstructorBuilder constructorBuilder = Constructor.builder(typeBuilder);
+		constructorBuilder.param("name").type("String").build();
+		constructorBuilder.param("age").type("int").build();
+		constructorBuilder.addAnnotation(Annotation.builder("Deprecated").build());
+		Constructor constructor = constructorBuilder.build();
 		
-		expect(constructor, "\n\t@Deprecated\n\tpublic A(String name, int age) {\n\t}");
+		expect(constructor, "\n@Deprecated\npublic A(String name, int age) {\n}");
 	}
 
 	@Test
 	public void testWithAnnotations() {
-		Type type = new Type("test.A");
-		Constructor constructor = new Constructor(type);
-		constructor.param("name").type("String");
-		constructor.param("age").type("int");
-		constructor.addAnnotation("Deprecated");
-		constructor.addAnnotation("Documented");
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		ConstructorBuilder constructorBuilder = Constructor.builder(typeBuilder);
+		constructorBuilder.param("name").type("String").build();
+		constructorBuilder.param("age").type("int").build();
+		constructorBuilder.addAnnotation(Annotation.builder("Deprecated").build());
+		constructorBuilder.addAnnotation(Annotation.builder("Documented").build());
+		Constructor constructor = constructorBuilder.build();
 		
-		expect(constructor, "\n\t@Deprecated\n\t@Documented\n\tpublic A(String name, int age) {\n\t}");
+		expect(constructor, "\n@Deprecated\n@Documented\npublic A(String name, int age) {\n}");
 	}
 
 	@Test
 	public void testHelloWorld() {
 		String statement = "System.out.println(\"Hello World!\");";
 		
-		Type type = new Type("test.A");
-		Constructor constructor = new Constructor(type);
-		constructor.body(Blocks._new(statement));
+		TypeBuilder typeBuilder = Type.builder("test.A");
+		ConstructorBuilder constructorBuilder = Constructor.builder(typeBuilder);
+		constructorBuilder.body(Blocks._new(statement));
+		Constructor constructor = constructorBuilder.build();
 		
-		expect(constructor, "\n\tpublic A() {\n\t\t" + statement + "\n\t}");
+		expect(constructor, "\npublic A() {\n\t" + statement + "\n}");
 	}
 	
 }

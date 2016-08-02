@@ -6,37 +6,41 @@ import codingeasy.Code;
 import codingeasy.EnumType;
 import codingeasy.Modifier;
 import codingeasy.Type;
+import codingeasy.Type.TypeBuilder;
 
 public class TestType extends AbstractCodingTest {
 
 	@Test
 	public void testEmptyClass() {
-		Type typeA = Code.newType("A");
+		Type typeA = Code.newType("A").build();
 		
 		expect(typeA, "\npublic class A {\n}");
 	}
 
 	@Test
 	public void testField() {
-		Type typeA = Code.newType("A");
-		typeA.field("name").type("String");
+		TypeBuilder typeBuilder = Code.newType("A");
+		typeBuilder.field("name").type("String").build();
+		Type typeA = typeBuilder.build();
 		
 		expect(typeA, "\npublic class A {\n\tprivate String name;\n}");
 	}
 
 	@Test
 	public void testMethod() {
-		Type typeA = Code.newType("A");
-		typeA.method("main").type("String").body("return \"Hello World\";");
+		TypeBuilder typeBuilder = Code.newType("A");
+		typeBuilder.method("main").returnType("String").body("return \"Hello World\";");
+		Type typeA = typeBuilder.build();
 		
 		expect(typeA, "\npublic class A {\n\tpublic String main() {\n\t\treturn \"Hello World\";\n\t}\n}");
 	}
 
 	@Test
 	public void testInterface() {
-		Type typeA = Code.newType("A");
-		typeA.type(EnumType.INTERFACE);
-		typeA.method("main").type("String").addModifier(Modifier.ABSTRACT).removeModifier(Modifier.PUBLIC);
+		TypeBuilder typeBuilder = Code.newType("A");
+		typeBuilder.type(EnumType.INTERFACE);
+		typeBuilder.method("main").returnType("String").addModifier(Modifier.ABSTRACT).removeModifier(Modifier.PUBLIC);
+		Type typeA = typeBuilder.build();
 		
 		expect(typeA, "\npublic interface A {\n\tString main();\n}");
 	}

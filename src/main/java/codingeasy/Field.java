@@ -1,92 +1,106 @@
 package codingeasy;
 
+import java.util.List;
 import java.util.Objects;
+
+import codingeasy.Method.MethodBuilder;
+import codingeasy.Type.TypeBuilder;
 
 public class Field extends CodeGen<Field> {
 
-	private String returnType;
-	private final Type type;
-	private String value;
+	private final String type;
+	private final String value;
 
-	public Field(Type type, String name) {
-		super(name);
-
+	protected Field(String name, String type, String value, Javadoc javadoc, List<Modifier> modifiers, List<Annotation> annotations) {
+		super(name, javadoc, modifiers, annotations);
 		this.type = type;
-
-		addModifier(Modifier.PRIVATE);
+		this.value = value;
 	}
 
-	public Field generateGetterAndSetter() {
-		generateGetter();
-		generateSetter();
-		return this;
+	public String getType() {
+		return type;
+	}
+
+	public String getValue() {
+		return value;
 	}
 	
-	public Field generateGetter() {
-		type.method(getGetter(getName())).type(returnType).body("return " + getName() + ";");
-		return this;
-	}
-
-	public Field generateSetter() {
-		type.method(getSetter(getName())).type("void")
-				.body("this." + getName() + " = " + getName() + ";").param(getName()).type(returnType);
-		return this;
-	}
-
-	public String getReturnType() {
-		return returnType;
-	}
-
-	public Field type(Class<?> type) {
-		return type(type.getName());
-	}
-
-	public Field type(String type) {
-		this.type.addImport(type);
-
-		type = type.replace("java.lang.", "");
-		if (type.contains(".")) {
-			type = type.substring(type.lastIndexOf(".") + 1);
-		}
-
-		this.returnType = type;
-		return this;
-	}
-
-	public Field value(String value) {
-		this.value = value;
-		return this;
-	}
-
-	public Field stringValue(String value) {
-		if (!Objects.isNull(value)) {
-			value = "\"" + value + "\"";
-		}
-		this.value = value;
-		return this;
-	}
-
 	@Override
 	public void print(CodePrinter code) {
-		code.line().ident();
+		code.line();
 
+		Javadoc javadoc = getJavadoc();
+		if (!Objects.isNull(javadoc)) {
+			javadoc.print(code);
+		}
+	
 		for (Modifier modifier : getModifiers()) {
 			code.append(modifier.getCode()).space();
 		}
 
-		code.append(returnType).space().append(getName());
+		code.append(type).space().append(getName());
 		if (value != null) {
 			code.space().append("=").space().append(value);
 		}
 		code.end();
 	}
 
-	private String getGetter(String name) {
-		return "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
+	public static FieldBuilder builder(TypeBuilder type, String name) {
+		return new FieldBuilder(type, name);
 	}
+	
+	public static class FieldBuilder extends CodeGen.CodeGenBuilder<FieldBuilder> {
+		
+		private final TypeBuilder typeBuilder;
+		private String type;
+		private String value;
+		
+		private FieldBuilder(TypeBuilder typeBuilder, String name) {
+			super(name);
+			this.typeBuilder = typeBuilder;
+			addModifier(Modifier.PRIVATE);
+		}
+		
+		public FieldBuilder type(Class<?> type) {
+			typeBuilder.addImport(type);
+			return type(type.getSimpleName());
+		}
+		
+		public FieldBuilder type(String type) {
+			this.type = type;
+			return this;
+		}
+		
+		public FieldBuilder value(String value) {
+			this.value = value;
+			return this;
+		}
 
-	private String getSetter(String name) {
-		return "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+		public FieldBuilder stringValue(String value) {
+			this.value = "\"" + value + "\"";
+			return this;
+		}
+		
+		public FieldBuilder getter() {
+			String methodName = "get" + getName().substring(0, 1).toUpperCase() + getName().substring(1);
+			typeBuilder.method(methodName).returnType(type).addModifier(Modifier.PUBLIC).body("return " + getName() + ";").build();
+			return this;
+		}
+
+		public FieldBuilder setter() {
+			String methodName = "set" + getName().substring(0, 1).toUpperCase() + getName().substring(1);
+			MethodBuilder methodBuilder = typeBuilder.method(methodName).returnType("void").addModifier(Modifier.PUBLIC).body("this." + getName() + " = " + getName() + ";");
+			methodBuilder.param(getName()).type(type).build();
+			methodBuilder.build();
+			return this;
+		}
+		
+		public Field build() {
+			Field field = new Field(getName(), type, value, getJavadoc(), getModifiers(), getAnnotations());
+			typeBuilder.field(field);
+			return field;
+		}
+
 	}
 	
 }
