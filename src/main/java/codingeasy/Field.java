@@ -81,18 +81,16 @@ public class Field extends CodeGen<Field> {
 			return this;
 		}
 		
-		public FieldBuilder getter() {
+		public MethodBuilder getter() {
 			String methodName = "get" + getName().substring(0, 1).toUpperCase() + getName().substring(1);
-			typeBuilder.method(methodName).returnType(type).addModifier(Modifier.PUBLIC).body("return " + getName() + ";").build();
-			return this;
+			return typeBuilder.method(methodName).returnType(type).addModifier(Modifier.PUBLIC).body("return " + getName() + ";");
 		}
 
-		public FieldBuilder setter() {
+		public MethodBuilder setter() {
 			String methodName = "set" + getName().substring(0, 1).toUpperCase() + getName().substring(1);
 			MethodBuilder methodBuilder = typeBuilder.method(methodName).returnType("void").addModifier(Modifier.PUBLIC).body("this." + getName() + " = " + getName() + ";");
 			methodBuilder.param(getName()).type(type).build();
-			methodBuilder.build();
-			return this;
+			return methodBuilder;
 		}
 		
 		public Field build() {

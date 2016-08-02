@@ -3,6 +3,7 @@ package test.codingeasy;
 import org.junit.Test;
 
 import codingeasy.Field;
+import codingeasy.Field.FieldBuilder;
 import codingeasy.Javadoc;
 import codingeasy.Modifier;
 import codingeasy.Type;
@@ -55,7 +56,9 @@ public class TestField extends AbstractCodingTest {
 	@Test
 	public void testGetter() {
 		TypeBuilder typeBuilder = Type.builder("test.A");
-		Field.builder(typeBuilder, "value").type("int").getter().build();
+		FieldBuilder fieldBuilder = Field.builder(typeBuilder, "value").type("int");
+		fieldBuilder.getter().build();
+		fieldBuilder.build();
 		Type type = typeBuilder.build();
 		
 		expect(type, "\npackage tes;\npublic class A {\n\tprivate int value;\n\tpublic int getValue() {\n\t\treturn value;\n\t}\n}");
@@ -64,7 +67,9 @@ public class TestField extends AbstractCodingTest {
 	@Test
 	public void testSetter() {
 		TypeBuilder typeBuilder = Type.builder("test.A");
-		Field.builder(typeBuilder, "value").type("int").setter().build();
+		FieldBuilder fieldBuilder = Field.builder(typeBuilder, "value").type("int");
+		fieldBuilder.setter().build();
+		fieldBuilder.build();
 		Type type = typeBuilder.build();
 		
 		expect(type, "\npackage tes;\npublic class A {\n\tprivate int value;\n\tpublic void setValue(int value) {\n\t\tthis.value = value;\n\t}\n}");

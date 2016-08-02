@@ -119,7 +119,11 @@ public class Type extends CodeGen<Type> {
 		}
 
 		if (!inner.isEmpty()) {
-			code.ident().append(inner.format().replace("\n", "\n\t"));
+			String innerCode = inner.format().replace("\n", "\n\t");
+			if (getType() == EnumType.INTERFACE) {
+				innerCode = innerCode.replace("public abstract ", "");
+			}
+			code.ident().append(innerCode);
 		}
 		
 		code.line().closeBrace();
