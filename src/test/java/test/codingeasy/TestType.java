@@ -1,5 +1,7 @@
 package test.codingeasy;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 
 import codingeasy.Code;
@@ -15,6 +17,20 @@ public class TestType extends AbstractCodingTest {
 		Type typeA = Code.newType("A").build();
 		
 		expect(typeA, "\npublic class A {\n}");
+	}
+
+	@Test
+	public void testConstructor() {
+		Type typeA = Code.newType("A").constructor(constructor -> constructor.addModifier(Modifier.PUBLIC)).build();
+		
+		expect(typeA, "\npublic class A {\n\tpublic A() {\n\t}\n}");
+	}
+
+	@Test
+	public void testImport() {
+		Type typeA = Code.newType("A").superClass(ArrayList.class).build();
+		
+		expect(typeA, "\nimport java.util.ArrayList;\npublic class A extends ArrayList {\n}");
 	}
 
 	@Test
@@ -49,6 +65,18 @@ public class TestType extends AbstractCodingTest {
 		Type typeA = typeBuilder.build();
 		
 		expect(typeA, "\npublic interface A {\n\tabstract String main();\n}");
+	}
+
+	@Test
+	public void testRunnable() {
+		TypeBuilder typeBuilder = Code.newType("A");
+		typeBuilder.addInterface("Runnable");
+		typeBuilder.method("run", method -> { 
+			method.addModifier(Modifier.PUBLIC);
+		});
+		Type typeA = typeBuilder.build();
+		
+		expect(typeA, "\npublic class A implements Runnable {\n\tpublic void run() {\n\t}\n}");
 	}
 	
 }

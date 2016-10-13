@@ -60,7 +60,7 @@ public class TestConstructor extends AbstractCodingTest {
 		constructorBuilder.param("age", param -> {
 			param.type("int");
 		});
-		constructorBuilder.addAnnotation(Annotation.builder("Deprecated").build());
+		constructorBuilder.addAnnotation("Deprecated", annotation -> {});
 		Constructor constructor = constructorBuilder.build();
 		
 		expect(constructor, "\n@Deprecated\npublic A(String name, int age) {\n}");
