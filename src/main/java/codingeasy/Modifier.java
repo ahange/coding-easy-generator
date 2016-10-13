@@ -8,7 +8,8 @@ public enum Modifier {
 	PRIVATE("private"),
 	STATIC("static"),
 	FINAL("final"),
-	ABSTRACT("abstract");
+	ABSTRACT("abstract"),
+	DEFAULT_METHOD("default");
 
 	private String code;
 
