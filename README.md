@@ -1,6 +1,7 @@
-[![Build Status](https://travis-ci.org/dgouvea/coding-easy-generator.svg?branch=master)](https://travis-ci.org/dgouvea/coding-easy-generator)
 # CodingEasy generator
 Java Code Generator based on Java 8
+
+[![Build Status](https://travis-ci.org/dgouvea/coding-easy-generator.svg?branch=master)](https://travis-ci.org/dgouvea/coding-easy-generator)
 
 ## Example
 
