@@ -4,10 +4,9 @@ import org.junit.Test;
 
 import codingeasy.Annotation;
 import codingeasy.Blocks;
-import codingeasy.Javadoc;
 import codingeasy.Method;
-import codingeasy.Modifier;
 import codingeasy.Method.MethodBuilder;
+import codingeasy.Modifier;
 import codingeasy.Type;
 import codingeasy.Type.TypeBuilder;
 
@@ -25,7 +24,9 @@ public class TestMethod extends AbstractCodingTest {
 	public void testWithParameter() {
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType("void").addModifier(Modifier.PUBLIC);
-		methodBuilder.param("name").type("String").build();
+		methodBuilder.param("name", param -> {
+			param.type("String");
+		});
 		Method method = methodBuilder.build();
 		
 		expect(method, "\npublic void test(String name) {\n}");
@@ -35,8 +36,12 @@ public class TestMethod extends AbstractCodingTest {
 	public void testWithParameters() {
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType("void").addModifier(Modifier.PUBLIC);
-		methodBuilder.param("name").type("String").build();
-		methodBuilder.param("age").type("int").build();
+		methodBuilder.param("name", param -> {
+			param.type("String");
+		});
+		methodBuilder.param("age", param -> {
+			param.type("int");
+		});
 		Method method = methodBuilder.build();
 		
 		expect(method, "\npublic void test(String name, int age) {\n}");
@@ -46,8 +51,12 @@ public class TestMethod extends AbstractCodingTest {
 	public void testWithAnnotation() {
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType("String").addModifier(Modifier.PUBLIC);
-		methodBuilder.param("name").type("String").build();
-		methodBuilder.param("age").type("int").build();
+		methodBuilder.param("name", param -> {
+			param.type("String");
+		});
+		methodBuilder.param("age", param -> {
+			param.type("int");
+		});
 		methodBuilder.addAnnotation(Annotation.builder("Deprecated").build());
 		Method method = methodBuilder.build();
 		
@@ -58,8 +67,12 @@ public class TestMethod extends AbstractCodingTest {
 	public void testWithAnnotations() {
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType("int").addModifier(Modifier.PUBLIC);
-		methodBuilder.param("name").type("String").build();
-		methodBuilder.param("age").type("int").build();
+		methodBuilder.param("name", param -> {
+			param.type("String");
+		});
+		methodBuilder.param("age", param -> {
+			param.type("int");
+		});
 		methodBuilder.addAnnotation(Annotation.builder("Deprecated").build());
 		methodBuilder.addAnnotation(Annotation.builder("Documented").build());
 		Method method = methodBuilder.build();
@@ -85,7 +98,7 @@ public class TestMethod extends AbstractCodingTest {
 		
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType(String.class).addModifier(Modifier.PUBLIC);
-		methodBuilder.javadoc(Javadoc.builder().text("Testing javadoc").build());
+		methodBuilder.javadoc(javadoc -> javadoc.text("Testing javadoc"));
 		methodBuilder.body(Blocks._new(statement));
 		Method method = methodBuilder.build();
 		
@@ -96,12 +109,16 @@ public class TestMethod extends AbstractCodingTest {
 	public void testJavadocWithParameters() {
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		MethodBuilder methodBuilder = Method.builder(typeBuilder, "test").returnType("String").addModifier(Modifier.PUBLIC);
-		methodBuilder.javadoc(Javadoc.builder().text("Testing javadoc").returnDoc("the user's name").build());
-		methodBuilder.param("name").type("String").javadoc(Javadoc.builder().text("the user's name").build()).build();
-		methodBuilder.param("age").type("int").javadoc(Javadoc.builder().text("the user's age").build()).build();
+		methodBuilder.javadoc(javadoc -> javadoc.text("Testing javadoc").returnDoc("the user's name"));
+		methodBuilder.param("name", param -> {
+			param.type("String").javadoc(javadoc -> javadoc.text("the user's name"));
+		});
+		methodBuilder.param("age", param -> {
+			param.type("int").javadoc(javadoc -> javadoc.text("the user's age"));
+		});
 		Method method = methodBuilder.build();
 		
-		expect(method, "\n/**\n * Testing javadoc\n * @param name the user's name\n * @param age the user's age\n * @return the user's name\n */\npublic void test(String name, int age) {\n}", true);
+		expect(method, "\n/**\n * Testing javadoc\n * @param name the user's name\n * @param age the user's age\n * @return the user's name\n */\npublic String test(String name, int age) {\n}");
 	}
 	
 }

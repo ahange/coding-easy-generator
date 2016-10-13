@@ -1,11 +1,15 @@
 package codingeasy;
 
-public class ForBlock extends CodeBlock {
+public class ForBlock extends CodeBlock<ForBlock> {
 
 	private String declare = "";
 	private String test = "";
 	private String increment = "";
 
+	protected ForBlock() {
+		
+	}
+	
 	public ForBlock to(String size) {
 		declare("int i = 0");
 		test("i < " + size);

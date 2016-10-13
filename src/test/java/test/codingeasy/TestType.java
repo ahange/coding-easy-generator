@@ -20,16 +20,20 @@ public class TestType extends AbstractCodingTest {
 	@Test
 	public void testField() {
 		TypeBuilder typeBuilder = Code.newType("A");
-		typeBuilder.field("name").type("String").build();
+		typeBuilder.field("name", field -> {
+			field.type("String");
+		});
 		Type typeA = typeBuilder.build();
 		
-		expect(typeA, "\npublic class A {\n\tprivate String name;\n}");
+		expect(typeA, "\npublic class A {\n\tString name;\n}");
 	}
 
 	@Test
 	public void testMethod() {
 		TypeBuilder typeBuilder = Code.newType("A");
-		typeBuilder.method("main").returnType("String").body("return \"Hello World\";");
+		typeBuilder.method("main", (method) -> {
+			method.addModifier(Modifier.PUBLIC).returnType("String").body("return \"Hello World\";");
+		});
 		Type typeA = typeBuilder.build();
 		
 		expect(typeA, "\npublic class A {\n\tpublic String main() {\n\t\treturn \"Hello World\";\n\t}\n}");
@@ -39,10 +43,12 @@ public class TestType extends AbstractCodingTest {
 	public void testInterface() {
 		TypeBuilder typeBuilder = Code.newType("A");
 		typeBuilder.type(EnumType.INTERFACE);
-		typeBuilder.method("main").returnType("String").addModifier(Modifier.ABSTRACT).removeModifier(Modifier.PUBLIC);
+		typeBuilder.method("main", method -> { 
+			method.returnType("String").addModifier(Modifier.ABSTRACT);
+		});
 		Type typeA = typeBuilder.build();
 		
-		expect(typeA, "\npublic interface A {\n\tString main();\n}");
+		expect(typeA, "\npublic interface A {\n\tabstract String main();\n}");
 	}
 	
 }

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
+import codingeasy.Javadoc.JavadocBuilder;
 import codingeasy.Parameter.ParameterBuilder;
 import codingeasy.Type.TypeBuilder;
 
@@ -12,23 +14,26 @@ public class Method extends CodeGen<Method> {
 
 	private final String returnType;
 	private final List<Parameter> parameters;
-	private final CodeBlock body;
+	private final CodeBlock<?> body;
 	
 	Method(String name, Javadoc javadoc, List<Modifier> modifiers, List<Annotation> annotations,
-			String returnType, List<Parameter> parameters, CodeBlock body) {
+			String returnType, List<Parameter> parameters, CodeBlock<?> body) {
 		super(name, javadoc, modifiers, annotations);
 		this.returnType = returnType;
 		this.parameters = Collections.unmodifiableList(parameters);
 		this.body = body;
 	}
-
+	
 	@Override
 	public void print(CodePrinter code) {
 		code.line();
 		
 		Javadoc javadoc = getJavadoc();
+		
 		if (!Objects.isNull(javadoc)) {
-			javadoc.print(code);
+			JavadocBuilder clone = Javadoc.builder().clone(javadoc);
+			parameters.forEach(param -> clone.param(param.getName(), param.getJavadoc().getText()));
+			clone.build().print(code);
 		}
 		
 		List<Annotation> annotations = getAnnotations();
@@ -78,7 +83,7 @@ public class Method extends CodeGen<Method> {
 		private final TypeBuilder typeBuilder;
 		private final List<Parameter> parameters = new ArrayList<>();
 		private String returnType = "void";
-		private CodeBlock body;
+		private CodeBlock<?> body;
 
 		MethodBuilder(TypeBuilder typeBuilder, String name) {
 			super(name);
@@ -97,8 +102,11 @@ public class Method extends CodeGen<Method> {
 			return returnType;
 		}
 		
-		public ParameterBuilder param(String name) {
-			return Parameter.builder(this, name);
+		public MethodBuilder param(String name, Consumer<ParameterBuilder> consumer) {
+			ParameterBuilder builder = Parameter.builder(this, name);
+			consumer.accept(builder);
+			builder.build();
+			return this;
 		}
 
 		public MethodBuilder returnType(Class<?> type) {
@@ -121,7 +129,7 @@ public class Method extends CodeGen<Method> {
 			return this;
 		}
 
-		public CodeBlock getBody() {
+		public CodeBlock<?> getBody() {
 			return body;
 		}
 		
@@ -130,7 +138,7 @@ public class Method extends CodeGen<Method> {
 			return this;
 		}
 		
-		public MethodBuilder body(CodeBlock body) {
+		public MethodBuilder body(CodeBlock<?> body) {
 			this.body = body;
 			return this;
 		}

@@ -18,8 +18,9 @@ public class Blocks {
 		return new ForBlock();
 	}
 
-	public static CodeBlock _new(String body) {
-		return new CodeBlock().code(body);
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static CodeBlock<CodeBlock<?>> _new(String body) {
+		return new CodeBlock<CodeBlock>().code(body);
 	}
 
 }

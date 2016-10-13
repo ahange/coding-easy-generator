@@ -6,6 +6,7 @@ import codingeasy.Annotation;
 import codingeasy.Blocks;
 import codingeasy.Constructor;
 import codingeasy.Constructor.ConstructorBuilder;
+import codingeasy.Modifier;
 import codingeasy.Type;
 import codingeasy.Type.TypeBuilder;
 
@@ -16,14 +17,17 @@ public class TestConstructor extends AbstractCodingTest {
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		Constructor constructor = Constructor.builder(typeBuilder).build();
 		
-		expect(constructor, "\npublic A() {\n}");
+		expect(constructor, "\nA() {\n}");
 	}
 
 	@Test
 	public void testWithParameter() {
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		ConstructorBuilder constructorBuilder = Constructor.builder(typeBuilder);
-		constructorBuilder.param("name").type("String").build();
+		constructorBuilder.addModifier(Modifier.PUBLIC);
+		constructorBuilder.param("name", param -> {
+			param.type("String");
+		});
 		Constructor constructor = constructorBuilder.build();
 		
 		expect(constructor, "\npublic A(String name) {\n}");
@@ -33,8 +37,13 @@ public class TestConstructor extends AbstractCodingTest {
 	public void testWithParameters() {
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		ConstructorBuilder constructorBuilder = Constructor.builder(typeBuilder);
-		constructorBuilder.param("name").type("String").build();
-		constructorBuilder.param("age").type("int").build();
+		constructorBuilder.addModifier(Modifier.PUBLIC);
+		constructorBuilder.param("name", param -> {
+			param.type("String");
+		});
+		constructorBuilder.param("age", param -> {
+			param.type("int");
+		});
 		Constructor constructor = constructorBuilder.build();
 		
 		expect(constructor, "\npublic A(String name, int age) {\n}");
@@ -44,8 +53,13 @@ public class TestConstructor extends AbstractCodingTest {
 	public void testWithAnnotation() {
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		ConstructorBuilder constructorBuilder = Constructor.builder(typeBuilder);
-		constructorBuilder.param("name").type("String").build();
-		constructorBuilder.param("age").type("int").build();
+		constructorBuilder.addModifier(Modifier.PUBLIC);
+		constructorBuilder.param("name", param -> {
+			param.type("String");
+		});
+		constructorBuilder.param("age", param -> {
+			param.type("int");
+		});
 		constructorBuilder.addAnnotation(Annotation.builder("Deprecated").build());
 		Constructor constructor = constructorBuilder.build();
 		
@@ -56,8 +70,13 @@ public class TestConstructor extends AbstractCodingTest {
 	public void testWithAnnotations() {
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		ConstructorBuilder constructorBuilder = Constructor.builder(typeBuilder);
-		constructorBuilder.param("name").type("String").build();
-		constructorBuilder.param("age").type("int").build();
+		constructorBuilder.addModifier(Modifier.PUBLIC);
+		constructorBuilder.param("name", param -> {
+			param.type("String");
+		});
+		constructorBuilder.param("age", param -> {
+			param.type("int");
+		});
 		constructorBuilder.addAnnotation(Annotation.builder("Deprecated").build());
 		constructorBuilder.addAnnotation(Annotation.builder("Documented").build());
 		Constructor constructor = constructorBuilder.build();
@@ -71,10 +90,11 @@ public class TestConstructor extends AbstractCodingTest {
 		
 		TypeBuilder typeBuilder = Type.builder("test.A");
 		ConstructorBuilder constructorBuilder = Constructor.builder(typeBuilder);
+		constructorBuilder.addModifier(Modifier.PRIVATE);
 		constructorBuilder.body(Blocks._new(statement));
 		Constructor constructor = constructorBuilder.build();
 		
-		expect(constructor, "\npublic A() {\n\t" + statement + "\n}");
+		expect(constructor, "\nprivate A() {\n\t" + statement + "\n}");
 	}
 	
 }

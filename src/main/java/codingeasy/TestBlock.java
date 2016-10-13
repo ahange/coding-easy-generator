@@ -1,6 +1,6 @@
 package codingeasy;
 
-public abstract class TestBlock<R extends TestBlock<?>> extends CodeBlock {
+public abstract class TestBlock<R extends TestBlock<?>> extends CodeBlock<R> {
 
 	protected final String keyword;
 	protected String test;

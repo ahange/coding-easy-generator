@@ -1,22 +1,32 @@
 package codingeasy;
 
-public class CodeBlock implements Printable {
+public class CodeBlock<T> implements Printable {
 
 	protected final StringBuilder code = new StringBuilder();
 
-	public CodeBlock code(String code) {
+	protected CodeBlock() {
+		
+	}
+	
+	protected String getCode() {
+		return code.toString();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public T code(String code) {
 		if (this.code.length() > 0) {
 			this.code.append("\n");
 		}
 		this.code.append(code);
-		return this;
+		return (T) this;
 	}
 
-	public CodeBlock code(CodeBlock code) {
+	@SuppressWarnings("unchecked")
+	public T code(CodeBlock<?> code) {
 		CodePrinter printer = new CodePrinter();
 		code.print(printer);
 		code(printer.format());
-		return this;
+		return (T) this;
 	}
 
 	@Override

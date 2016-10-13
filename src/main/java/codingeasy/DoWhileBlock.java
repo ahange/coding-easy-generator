@@ -2,7 +2,7 @@ package codingeasy;
 
 public class DoWhileBlock extends TestBlock<DoWhileBlock> {
 
-	public DoWhileBlock() {
+	protected DoWhileBlock() {
 		super("while");
 	}
 

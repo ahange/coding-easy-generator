@@ -3,7 +3,6 @@ package codingeasy;
 import java.util.List;
 import java.util.Objects;
 
-import codingeasy.Method.MethodBuilder;
 import codingeasy.Type.TypeBuilder;
 
 public class Field extends CodeGen<Field> {
@@ -58,7 +57,6 @@ public class Field extends CodeGen<Field> {
 		private FieldBuilder(TypeBuilder typeBuilder, String name) {
 			super(name);
 			this.typeBuilder = typeBuilder;
-			addModifier(Modifier.PRIVATE);
 		}
 		
 		public FieldBuilder type(Class<?> type) {
@@ -83,15 +81,20 @@ public class Field extends CodeGen<Field> {
 		
 		public FieldBuilder getter() {
 			String methodName = "get" + getName().substring(0, 1).toUpperCase() + getName().substring(1);
-			typeBuilder.method(methodName).returnType(type).addModifier(Modifier.PUBLIC).body("return " + getName() + ";").build();
+			typeBuilder.method(methodName, method -> {
+				method.returnType(type).addModifier(Modifier.PUBLIC).body("return " + getName() + ";");
+			});
 			return this;
 		}
 
 		public FieldBuilder setter() {
 			String methodName = "set" + getName().substring(0, 1).toUpperCase() + getName().substring(1);
-			MethodBuilder methodBuilder = typeBuilder.method(methodName).returnType("void").addModifier(Modifier.PUBLIC).body("this." + getName() + " = " + getName() + ";");
-			methodBuilder.param(getName()).type(type).build();
-			methodBuilder.build();
+			typeBuilder.method(methodName, method -> {
+				method.returnType("void").addModifier(Modifier.PUBLIC).body("this." + getName() + " = " + getName() + ";");
+				method.param(getName(), param -> {
+					param.type(type);
+				});
+			});
 			return this;
 		}
 		

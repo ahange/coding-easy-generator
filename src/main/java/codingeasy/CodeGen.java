@@ -3,6 +3,10 @@ package codingeasy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
+
+import codingeasy.Annotation.AnnotationBuilder;
+import codingeasy.Javadoc.JavadocBuilder;
 
 public abstract class CodeGen<R extends CodeGen<?>> implements Printable {
 
@@ -59,8 +63,10 @@ public abstract class CodeGen<R extends CodeGen<?>> implements Printable {
 		}
 		
 		@SuppressWarnings("unchecked")
-		public T javadoc(Javadoc javadoc) {
-			this.javadoc = javadoc;
+		public T javadoc(Consumer<JavadocBuilder> consumer) {
+			JavadocBuilder javadocBuilder = Javadoc.builder();
+			consumer.accept(javadocBuilder);
+			this.javadoc = javadocBuilder.build();
 			return (T) this;
 		}
 
@@ -86,6 +92,15 @@ public abstract class CodeGen<R extends CodeGen<?>> implements Printable {
 		
 		@SuppressWarnings("unchecked")
 		public T addAnnotation(Annotation annotation) {
+			annotations.add(annotation);
+			return (T) this;
+		}
+
+		@SuppressWarnings("unchecked")
+		public T addAnnotation(String name, Consumer<AnnotationBuilder> consumer) {
+			AnnotationBuilder annotationBuilder = Annotation.builder(name);
+			consumer.accept(annotationBuilder);
+			Annotation annotation = annotationBuilder.build();
 			annotations.add(annotation);
 			return (T) this;
 		}

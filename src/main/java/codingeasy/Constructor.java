@@ -6,7 +6,7 @@ import codingeasy.Type.TypeBuilder;
 
 public class Constructor extends Method {
 
-	Constructor(String name, Javadoc javadoc, List<Modifier> modifiers, List<Annotation> annotations, List<Parameter> parameters, CodeBlock body) {
+	Constructor(String name, Javadoc javadoc, List<Modifier> modifiers, List<Annotation> annotations, List<Parameter> parameters, CodeBlock<?> body) {
 		super(name, javadoc, modifiers, annotations, null, parameters, body);
 	}
 
@@ -23,11 +23,17 @@ public class Constructor extends Method {
 
 		ConstructorBuilder(TypeBuilder typeBuilder, String name) {
 			super(typeBuilder, name);
-			addModifier(Modifier.PUBLIC);
 		}
 
 		@Override
-		public MethodBuilder returnType(String type) {
+		@Deprecated
+		public ConstructorBuilder returnType(String type) {
+			throw new IllegalArgumentException("Constructor has no return type");
+		}
+		
+		@Override
+		@Deprecated
+		public ConstructorBuilder returnType(Class<?> type) {
 			throw new IllegalArgumentException("Constructor has no return type");
 		}
 		

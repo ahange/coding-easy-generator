@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import codingeasy.Constructor.ConstructorBuilder;
 import codingeasy.Field.FieldBuilder;
@@ -186,23 +187,32 @@ public class Type extends CodeGen<Type> {
 			return this;
 		}
 		
-		public FieldBuilder field(String name) {
-			return Field.builder(this, name);
+		public TypeBuilder field(String name, Consumer<FieldBuilder> consumer) {
+			FieldBuilder fieldBuilder = Field.builder(this, name);
+			consumer.accept(fieldBuilder);
+			fieldBuilder.build();
+			return this;
 		}
 
-		public ConstructorBuilder constructor() {
-			return Constructor.builder(this);
+		public TypeBuilder constructor(Consumer<ConstructorBuilder> consumer) {
+			ConstructorBuilder constructorBuilder = Constructor.builder(this);
+			consumer.accept(constructorBuilder);
+			constructorBuilder.build();
+			return this;
 		}
 
+		public TypeBuilder method(String name, Consumer<MethodBuilder> consumer) {
+			MethodBuilder methodBuilder = Method.builder(this, name);
+			consumer.accept(methodBuilder);
+			methodBuilder.build();
+			return this;
+		}
+		
 		public TypeBuilder method(Method method) {
 			methods.add(method);
 			return this;
 		}
 		
-		public MethodBuilder method(String name) {
-			return Method.builder(this, name);
-		}
-
 		public TypeBuilder type(EnumType type) {
 			enumType = type;
 			return this;

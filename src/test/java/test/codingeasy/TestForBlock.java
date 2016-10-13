@@ -2,6 +2,7 @@ package test.codingeasy;
 
 import org.junit.Test;
 
+import codingeasy.Blocks;
 import codingeasy.ForBlock;
 
 public class TestForBlock extends AbstractCodingTest {
@@ -10,7 +11,7 @@ public class TestForBlock extends AbstractCodingTest {
 	public void testInfinity() {
 		String statement = "System.out.println(\"done\");";
 
-		ForBlock _for = new ForBlock();
+		ForBlock _for = Blocks._for();
 		_for.code(statement);
 		
 		expect(_for, "for (; ; ) {\n\t" + statement + "\n}");
@@ -20,7 +21,7 @@ public class TestForBlock extends AbstractCodingTest {
 	public void testTo10() {
 		String statement = "System.out.println(\"done\");";
 		
-		ForBlock _for = new ForBlock();
+		ForBlock _for = Blocks._for();
 		_for.to("10").code(statement);
 		
 		expect(_for, "for (int i = 0; i < 10; i++) {\n\t" + statement + "\n}");
@@ -30,7 +31,7 @@ public class TestForBlock extends AbstractCodingTest {
 	public void testSimple() {
 		String statement = "System.out.println(\"done\");";
 		
-		ForBlock _for = new ForBlock();
+		ForBlock _for = Blocks._for();
 		_for.declare("int x = 0").test("x < 3").increment("x++").code(statement);
 		
 		expect(_for, "for (int x = 0; x < 3; x++) {\n\t" + statement + "\n}");
