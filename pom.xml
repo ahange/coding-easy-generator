@@ -6,6 +6,29 @@
 	<artifactId>coding-easy-generator</artifactId>
 	<version>0.2.0</version>
 
+	<description>Java Code Generator based on Java 8</description>
+	<url>https://github.com/dgouvea/coding-easy-generator</url>
+
+	<contributors>
+		<contributor>
+			<name>David Sobreira Gouvea</name>
+			<email>david.sobreira.gouvea@gmail.com</email>
+			<url>https://github.com/dgouvea</url>
+		</contributor>
+	</contributors>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>https://github.com/dgouvea/coding-easy-generator.git</url>
+	</scm>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
