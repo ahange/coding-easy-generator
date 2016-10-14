@@ -2,6 +2,7 @@
 Java Code Generator based on Java 8
 
 [![Build Status](https://travis-ci.org/dgouvea/coding-easy-generator.svg?branch=master)](https://travis-ci.org/dgouvea/coding-easy-generator)
+[![Coverage Status](https://coveralls.io/repos/github/dgouvea/coding-easy-generator/badge.svg?branch=master)](https://coveralls.io/github/dgouvea/coding-easy-generator?branch=master)
 
 ## Example
 
